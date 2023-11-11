@@ -1,9 +1,9 @@
 package pro.sky.java.course2.weblibrary.service;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import pro.sky.java.course2.weblibrary.exceptions.EmployeeNotFoundException;
+import pro.sky.java.course2.weblibrary.exceptions.InvalidInputException;
 import pro.sky.java.course2.weblibrary.model.Employee;
-
 import javax.annotation.PostConstruct;
 import java.util.*;
 @Service
@@ -18,12 +18,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
     @Override
     public Employee addEmployee(String lastName, String firstName, int department, int salary) {
+        if (!validateInput(firstName, lastName)) {
+            throw new InvalidInputException();
+        }
         Employee employee = new Employee(lastName, firstName, department, salary);
         employeesMap.putIfAbsent(lastName + " " + firstName, employee);
         return employee;
     }
     @Override
     public Employee removeEmployee(String lastName, String firstName, int department, int salary) {
+        if (!validateInput(firstName, lastName)) {
+            throw new InvalidInputException();
+        }
         Employee employee = new Employee(lastName, firstName, department, salary);
         if (employeesMap.containsValue(employee)) {
             employeesMap.remove(employee);
@@ -34,6 +40,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
     @Override
     public Employee findEmployee(String lastName, String firstName, int department, int salary) {
+        if (!validateInput(firstName, lastName)) {
+            throw new InvalidInputException();
+        }
         Employee employee = new Employee(lastName, firstName, department, salary);
         if (employeesMap.containsValue(employee)) {
             return employee;
@@ -48,5 +57,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> list() {
         return Collections.unmodifiableList(employees);
+    }
+
+    private boolean validateInput(String firstName, String lastName) {
+        return StringUtils.isAlpha(firstName) & StringUtils.isAlpha(lastName);
     }
 }
